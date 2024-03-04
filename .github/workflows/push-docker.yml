@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - name: "📥 Check-out"
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: "📄 Parse Docker metadata"
       id: docker_meta
       uses: crazy-max/ghaction-docker-meta@v1
@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
     - name: "📥 Check-out"
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: "📄 Parse Docker metadata"
       id: docker_meta
       uses: crazy-max/ghaction-docker-meta@v1
