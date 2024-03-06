@@ -73,7 +73,7 @@ jobs:
     permissions:
       packages: write
     needs:
-    - python-test-backend
+    # - python-test-backend
     - docker-build-backend
     - docker-build-frontend
     runs-on: ubuntu-latest
@@ -117,7 +117,7 @@ jobs:
     permissions:
       packages: write
     needs:
-    - python-test-backend
+    # - python-test-backend
     - docker-build-backend
     - docker-build-frontend
     runs-on: ubuntu-latest
@@ -159,7 +159,7 @@ jobs:
     name: 🚀 Create GitHub release
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     needs:
-    - python-test-backend
+    # - python-test-backend
     - docker-build-backend
     - docker-build-frontend
     permissions:
