@@ -1,37 +1,180 @@
-name: "Python CI"
+name: CI
 
-on: push
+on:
+  push:
 
 jobs:
-  test-backend:
-    name: "✔️ Test backend API"
-    runs-on: ubuntu-20.04
+  python-test-backend:
+    name: 🧪 Test backend Python code
     strategy:
       matrix:
         python-version:
         - '3.6'
         - '3.8'
+    runs-on: ubuntu-latest
     steps:
-    - name: "📥 Check-out"
+    - name: 📥 Check-out
       uses: actions/checkout@v4
-    - name: "🧰 Install Python"
+    - name: 🧰 Install Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - name: "🧰 Install Python requirements"
-      working-directory: ./src/Backend
-      run: |
-        pip install "pipenv>=2020.8.13"
-        pipenv install
-    - name: "📥 Download NLTK tools"
-      working-directory: ./src/Backend
+        cache: pip
+        cache-dependency-path: src/Backend/Pipfile.lock
+    - name: 🧰 Install Pipenv
+      run: pip install pipenv
+    - name: 🧰 Install Python requirements
+      working-directory: src/Backend
+      run: pipenv install
+    - name: 📥 Download NLTK tools
+      working-directory: src/Backend
       run: |
         pipenv run python -m nltk.downloader stopwords
         pipenv run python -m nltk.downloader punkt
         pipenv run python -m nltk.downloader averaged_perceptron_tagger
-    - name: "✔️ Test API"
-      working-directory: ./src/Backend
+    - name: 🧪 Test Python code
+      working-directory: src/Backend
       run: pipenv run python test.py
       env:
         ES_USERNAME: reader
         ES_PASSWORD: reader
+  docker-build-backend:
+    name: 🏗️ Build backend Docker image
+    runs-on: ubuntu-latest
+    steps:
+    - name: 📥 Check-out
+      uses: actions/checkout@v3
+    - name: 🧰 Set up QEMU
+      uses: docker/setup-qemu-action@v2
+    - name: 🧰 Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - name: 🏗️ Build Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: src/Backend
+        push: false
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+  docker-build-frontend:
+    name: 🏗️ Build frontend Docker image
+    runs-on: ubuntu-latest
+    steps:
+    - name: 📥 Check-out
+      uses: actions/checkout@v3
+    - name: 🧰 Set up QEMU
+      uses: docker/setup-qemu-action@v2
+    - name: 🧰 Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - name: 🏗️ Build Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: src/Frontend/camFrontend
+        push: false
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+  docker-publish-backend:
+    name: 🚀 Publish backend Docker image
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    permissions:
+      packages: write
+    needs:
+    - docker-build-backend
+    - docker-build-frontend
+    runs-on: ubuntu-latest
+    steps:
+    - name: 📥 Check-out
+      uses: actions/checkout@v3
+    - name: 🧰 Set up QEMU
+      uses: docker/setup-qemu-action@v2
+    - name: 🧰 Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - name: 🔑 Login to GitHub Packages
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: 🔑 Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+    - name: ℹ️ Extract image metadata
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: |
+          webis/cam-backend
+          ghcr.io/${{ github.repository }}/cam-backend
+    - name: 🚀 Build and push image
+      uses: docker/build-push-action@v4
+      with:
+        context: src/Backend
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+  docker-publish-frontend:
+    name: 🚀 Publish frontend Docker image
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    permissions:
+      packages: write
+    needs:
+    - docker-build-backend
+    - docker-build-frontend
+    runs-on: ubuntu-latest
+    steps:
+    - name: 📥 Check-out
+      uses: actions/checkout@v3
+    - name: 🧰 Set up QEMU
+      uses: docker/setup-qemu-action@v2
+    - name: 🧰 Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - name: 🔑 Login to GitHub Packages
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: 🔑 Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+    - name: ℹ️ Extract image metadata
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: |
+          webis/cam-frontend
+          ghcr.io/${{ github.repository }}/cam-frontend
+    - name: 🚀 Build and push image
+      uses: docker/build-push-action@v4
+      with:
+        context: src/Frontend/camFrontend
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+  github-release:
+    name: 🚀 Create GitHub release
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    needs:
+    - docker-build-backend
+    - docker-build-frontend
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+    - name: 📥 Check-out
+      uses: actions/checkout@v3
+    - name: 🚀 Create GitHub release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Release ${{ github.ref_name }}
+        fail_on_unmatched_files: true
+        draft: false
+        prerelease: false
+        generate_release_notes: true
