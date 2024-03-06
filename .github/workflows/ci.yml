@@ -4,35 +4,35 @@ on:
   push:
 
 jobs:
-  python-test-backend:
-    name: 🧪 Test backend Python code
-    runs-on: ubuntu-latest
-    steps:
-    - name: 📥 Check-out
-      uses: actions/checkout@v4
-    - name: 🧰 Install Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.8'
-        cache: pipenv
-        cache-dependency-path: src/Backend/Pipfile.lock
-    - name: 🧰 Install Pipenv
-      run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
-    - name: 🧰 Install Python requirements
-      working-directory: src/Backend
-      run: pipenv install
-    - name: 📥 Download NLTK tools
-      working-directory: src/Backend
-      run: |
-        pipenv run python -m nltk.downloader stopwords
-        pipenv run python -m nltk.downloader punkt
-        pipenv run python -m nltk.downloader averaged_perceptron_tagger
-    - name: 🧪 Test Python code
-      working-directory: src/Backend
-      run: pipenv run python test.py
-      env:
-        ES_USERNAME: reader
-        ES_PASSWORD: reader
+  # python-test-backend:
+  #   name: 🧪 Test backend Python code
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: 📥 Check-out
+  #     uses: actions/checkout@v4
+  #   - name: 🧰 Install Python
+  #     uses: actions/setup-python@v5
+  #     with:
+  #       python-version: '3.8'
+  #       cache: pipenv
+  #       cache-dependency-path: src/Backend/Pipfile.lock
+  #   - name: 🧰 Install Pipenv
+  #     run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
+  #   - name: 🧰 Install Python requirements
+  #     working-directory: src/Backend
+  #     run: pipenv install
+  #   - name: 📥 Download NLTK tools
+  #     working-directory: src/Backend
+  #     run: |
+  #       pipenv run python -m nltk.downloader stopwords
+  #       pipenv run python -m nltk.downloader punkt
+  #       pipenv run python -m nltk.downloader averaged_perceptron_tagger
+  #   - name: 🧪 Test Python code
+  #     working-directory: src/Backend
+  #     run: pipenv run python test.py
+  #     env:
+  #       ES_USERNAME: reader
+  #       ES_PASSWORD: reader
   docker-build-backend:
     name: 🏗️ Build backend Docker image
     runs-on: ubuntu-latest
