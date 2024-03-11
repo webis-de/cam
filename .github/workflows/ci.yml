@@ -43,13 +43,19 @@ jobs:
       uses: docker/setup-qemu-action@v2
     - name: 🧰 Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
-    - name: 🏗️ Build Docker image
+    - name: 🏗️ Build Docker base image
       uses: docker/build-push-action@v4
       with:
         context: src/Backend
         push: false
         cache-from: type=gha
         cache-to: type=gha,mode=max
+        target: pipenv-with-dependencies
+    - name: 🏗️ Build Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: src/Backend
+        push: false
   docker-build-frontend:
     name: 🏗️ Build frontend Docker image
     runs-on: ubuntu-latest
@@ -102,6 +108,14 @@ jobs:
         images: |
           webis/cam-backend
           ghcr.io/${{ github.repository }}/cam-backend
+    - name: 🏗️ Build Docker base image
+      uses: docker/build-push-action@v4
+      with:
+        context: src/Backend
+        push: false
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        target: pipenv-with-dependencies
     - name: 🚀 Build and push image
       uses: docker/build-push-action@v4
       with:
@@ -109,8 +123,11 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+    - name: 🏗️ Build Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: src/Backend
+        push: false
   docker-publish-frontend:
     name: 🚀 Publish frontend Docker image
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')

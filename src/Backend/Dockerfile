@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.8 as pipenv-with-dependencies
 
 # Set the working directory to /app
 WORKDIR /app
@@ -7,6 +7,8 @@ WORKDIR /app
 RUN pip install pipenv
 COPY Pipfile Pipfile.lock ./
 RUN pipenv install --system --deploy
+
+FROM pipenv-with-dependencies
 
 # Download machine learning files.
 RUN python -m nltk.downloader stopwords
