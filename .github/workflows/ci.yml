@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: 📥 Check-out
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 🧰 Set up QEMU
       uses: docker/setup-qemu-action@v3
     - name: 🧰 Set up Docker Buildx
@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: 📥 Check-out
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 🧰 Set up QEMU
       uses: docker/setup-qemu-action@v3
     - name: 🧰 Set up Docker Buildx
@@ -85,7 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: 📥 Check-out
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 🧰 Set up QEMU
       uses: docker/setup-qemu-action@v3
     - name: 🧰 Set up Docker Buildx
@@ -140,7 +140,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: 📥 Check-out
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 🧰 Set up QEMU
       uses: docker/setup-qemu-action@v3
     - name: 🧰 Set up Docker Buildx
@@ -184,7 +184,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: 📥 Check-out
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 🚀 Create GitHub release
       uses: softprops/action-gh-release@v2
       with:
