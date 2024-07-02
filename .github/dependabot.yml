@@ -7,7 +7,7 @@ updates:
   - package-ecosystem: npm
     directory: /src/Frontend/camFrontend/
     schedule:
-      interval: weekly
+      interval: monthly
   - package-ecosystem: docker
     directory: /src/Frontend/camFrontend/
     schedule:
