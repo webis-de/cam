@@ -22,7 +22,7 @@
     "@angular/material": "6.2.1",
     "@angular/platform-browser": "^6.0.3",
     "@angular/platform-browser-dynamic": "^6.0.3",
-    "@angular/router": "^6.0.3",
+    "@angular/router": "^19.2.4",
     "@nicky-lenaers/ngx-scroll-to": "^1.1.1",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.8",
